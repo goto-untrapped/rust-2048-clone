@@ -7,5 +7,6 @@ edition = "2021"
 
 [dependencies]
 rustc-serialize = "0.3"
+rand = "0.3.7"
 piston_window = "0.127.0"
 piston2d-opengl_graphics = "0.82.0"

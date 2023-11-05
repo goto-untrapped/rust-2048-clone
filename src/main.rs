@@ -30,8 +30,9 @@ fn main() {
     while let Some(e) = window.next() {
         // レンダリング用の引数？
         if let Some(ref args) = e.render_args() {
-            generate_board(args, &mut gl);
-            tile = generate_tile(args, &mut gl, &mut tile);
+            app.render(args, &mut gl);
+            // generate_board(args, &mut gl);
+            // tile = generate_tile(args, &mut gl, &mut tile);
         }
 
         if let Some(ref args) = e.press_args() {
