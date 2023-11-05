@@ -53,7 +53,7 @@ impl<'a> Board<'a> {
         // ボードを描画
         self.render_board(c, gl);
         // タイルを描画
-        // self.render_tiles(c, gl);
+        self.render_tiles(c, gl);
     }
 
     fn render_board(&self, c: &Context, gl: &mut GlGraphics) {
@@ -91,6 +91,12 @@ impl<'a> Board<'a> {
             // 次の段のタイルの座標を設定
             x = self.settings.board_padding + self.settings.tile_padding;
             y += self.settings.tile_padding + self.settings.tile_size;
+        }
+    }
+
+    fn render_tiles(&self, c: &Context, gl: &mut GlGraphics) {
+        for tile in self.tiles.iter() {
+            tile.render(c, gl);
         }
     }
 }

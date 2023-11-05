@@ -1,4 +1,6 @@
 use crate::settings::Settings;
+use opengl_graphics::GlGraphics;
+use piston_window::*;
 
 pub struct Tile<'a> {
     pub tile_x: i32,
@@ -15,5 +17,21 @@ impl<'a> Tile<'a> {
 
             settings: settings,
         }
+    }
+
+    pub fn render(&self, c: &Context, gl: &mut GlGraphics) {
+        // タイルを描画
+        Rectangle::new([1.0, 1.0, 1.0, 1.0]).draw(
+            // TODO
+            rectangle::centered([
+                self.tile_x as f64 + self.settings.tile_size / 2.0,
+                self.tile_y as f64 + self.settings.tile_size / 2.0,
+                self.settings.tile_size as f64 / 2.0,
+                self.settings.tile_size as f64 / 2.0,
+            ]),
+            &DrawState::default(),
+            c.transform,
+            gl,
+        );
     }
 }
