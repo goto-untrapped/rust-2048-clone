@@ -31,4 +31,12 @@ impl<'a> App<'a> {
         })
     }
 
+    pub fn key_press(&mut self, args: &Button) {
+        use piston_window::Button::Keyboard;
+
+        if *args == Keyboard(Key::Right) {
+            self.board.move_from_left_to_right();
+        }
+    }
+
 }

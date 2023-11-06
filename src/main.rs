@@ -31,45 +31,11 @@ fn main() {
         // レンダリング用の引数？
         if let Some(ref args) = e.render_args() {
             app.render(args, &mut gl);
-            // generate_board(args, &mut gl);
-            // tile = generate_tile(args, &mut gl, &mut tile);
         }
 
         if let Some(ref args) = e.press_args() {
-            use piston_window::Button::Keyboard;
-
-            if *args == Keyboard(Key::Right) {
-                println!("right entered");
-                move_tile_to_right(&mut tile);
-            }
+            app.key_press(args);
         }
-    }
-
-    // ボードを描画
-    fn generate_board(args: &RenderArgs, gl: &mut GlGraphics) {
-        for x in 0..2 {
-            for y in 0..2 {
-                gl.draw(args.viewport(), |c, gl| {
-                    Rectangle::new([0.0, 0.5, 0.0, 1.0])
-                        .draw(rectangle::centered([100.0 * (x + 1) as f64, 100.0 * (y + 1) as f64, 50.0, 50.0]), 
-                            &DrawState::default(), 
-                            c.transform,   
-                            gl);
-                });
-            }
-        }
-    }
-
-    // 四角を描画
-    fn generate_tile(args: &RenderArgs, gl: &mut GlGraphics, tile: &mut Tile) -> Tile {
-        gl.draw(args.viewport(), |c, gl| {
-            Rectangle::new([1.0, 1.0, 1.0, 1.0])
-                .draw(rectangle::centered([tile.pos_x as f64, tile.pos_y as f64, 50.0, 50.0]), 
-                    &DrawState::default(), 
-                    c.transform,   
-                    gl);
-        });
-        Tile { pos_x: tile.pos_x, pos_y: tile.pos_y }
     }
 
     // タイルを右に動かす
