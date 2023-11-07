@@ -2,6 +2,7 @@ use crate::settings::Settings;
 use opengl_graphics::GlGraphics;
 use piston_window::*;
 
+#[derive(Debug)]
 pub enum TileState {
     TileStatic,
     // (t, x, y, origin_x, origin_y)
@@ -28,30 +29,6 @@ impl<'a> Tile<'a> {
 
             settings: settings,
         }
-    }
-
-    pub fn render(&self, c: &Context, gl: &mut GlGraphics) {
-        // タイルの座標を計算
-        let mut pos: (f64, f64) = self.tile_to_pos(self.tile_x, self.tile_y);
-        // タイルのサイズ
-        let mut size = (self.settings.tile_size, self.settings.tile_size);
-
-        let (x, y) = pos;
-        let (w, h) = size;
-
-        // タイルを描画
-        Rectangle::new([1.0, 1.0, 1.0, 1.0]).draw(
-            // TODO
-            rectangle::centered([
-                x as f64 + self.settings.tile_size / 2.0,
-                y as f64 + self.settings.tile_size / 2.0,
-                w as f64 / 2.0,
-                h as f64 / 2.0,
-            ]),
-            &DrawState::default(),
-            c.transform,
-            gl,
-        );
     }
 
     fn tile_to_pos(&self, tile_x: i32, tile_y: i32) -> (f64, f64) {
@@ -85,5 +62,35 @@ impl<'a> Tile<'a> {
             },
             _ => {},
         }
+    }
+
+    pub fn render(&self, c: &Context, gl: &mut GlGraphics) {
+        // タイルの座標を計算
+        let mut pos: (f64, f64) = self.tile_to_pos(self.tile_x, self.tile_y);
+        // タイルのサイズ
+        let mut size = (self.settings.tile_size, self.settings.tile_size);
+
+        match self.status {
+            TileState::TileMoving(_, x, y, _, _) => {
+                pos = (x, y);
+            },
+            _ => {},
+        }
+
+        let (x, y) = pos;
+        let (w, h) = size;
+
+        // タイルを描画
+        Rectangle::new([1.0, 1.0, 1.0, 1.0]).draw(
+            rectangle::centered([
+                x as f64 + self.settings.tile_size / 2.0,
+                y as f64 + self.settings.tile_size / 2.0,
+                w as f64 / 2.0,
+                h as f64 / 2.0,
+            ]),
+            &DrawState::default(),
+            c.transform,
+            gl,
+        );
     }
 }

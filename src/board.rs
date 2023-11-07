@@ -113,6 +113,9 @@ impl<'a> Board<'a> {
     }
 
     fn merge_row(&mut self, x_start: i32, x_end: i32, x_step: i32) {
+        for tile in &self.tiles {
+            println!("{:?} in merge_row_first", tile.status);
+        }
 
         let mut need_generate = false;
         let mut steps: Vec<i32> = Vec::with_capacity(self.settings.tile_width as usize);
