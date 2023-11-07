@@ -48,6 +48,12 @@ impl<'a> Board<'a> {
         None
     }
 
+    pub fn update(&mut self, dt: f64) {
+        for tile in self.tiles.iter_mut() {
+            tile.update(dt);
+        }
+    }
+
     pub fn render(&self, c: &Context, gl: &mut GlGraphics) {
 
         // ボードを描画
@@ -99,6 +105,92 @@ impl<'a> Board<'a> {
             tile.render(c, gl);
         }
     }
+
+    pub fn move_from_left_to_right(&mut self) {
+        let width = self.settings.tile_width;
+        // 動かす先のタイルの検索に使う
+        self.merge_row(width - 1, -1, -1);
+    }
+
+    fn merge_row(&mut self, x_start: i32, x_end: i32, x_step: i32) {
+
+        let mut need_generate = false;
+        let mut steps: Vec<i32> = Vec::with_capacity(self.settings.tile_width as usize);
+        let mut next_step = x_start;
+
+        // 動かす先のタイルの検索に使う
+        // 左から右に動かす時
+        if x_step < 0 {
+            while next_step > x_end {
+                steps.push(next_step); next_step += x_step
+            } 
+        } // 右から左に動かす時
+        else {
+        }
+
+        // タイルを動かす
+        loop {
+            for row in 0..self.settings.tile_height {
+                for col in steps.to_vec() {
+                    // 動かす先に既にタイルが置いてあるか
+                    match self.get_mut_tile(col, row) {
+                        // まだタイルが置かれていない場合
+                        None => {
+                            // 動かす元のタイルがあるか
+                            match self.get_mut_next_tile(col, row, x_step, 0) {
+                                // 動かす元のタイルがある場合、タイルの座標を更新して、動かす
+                                Some (ref mut tile) => {
+                                    println!("move ({}, {}) to ({}, {})", tile.tile_x, tile.tile_y, col, row);
+                                    need_generate = true;
+                                    tile.start_moving(col, row);
+                                },
+                                // 動かす元のタイルがない場合、何もしない
+                                _ => {},
+                            }
+                        },
+                        // タイルが既に置かれている場合、何もしない
+                        _ => {},
+                    }
+                }
+            }
+            break;
+        }
+    }
+
+    fn get_mut_next_tile<'b>(&'b mut self, x: i32, y: i32, step_x: i32, step_y: i32) -> Option<&'b mut Tile<'a>> {
+        let mut x = x + step_x;
+        let mut y = y + step_y;
+        let mut found = false;
+        while x >= 0 && x < self.settings.tile_width
+        && y >= 0 && y < self.settings.tile_height {
+            let tile = self.get_tile(x, y);
+
+            if tile.is_some() {
+                found = true;
+                break;
+            }
+            x += step_x;
+            y += step_y;
+        }
+
+        if found {
+            self.get_mut_tile(x, y)
+        } else {
+            None
+        }
+    }
+
+    fn get_mut_tile<'b>(&'b mut self, x: i32, y: i32) -> Option<&'b mut Tile<'a>> {
+        for tile in self.tiles.iter_mut() {
+            if tile.tile_x == x && tile.tile_y == y {
+                return Some(tile);
+            }
+        }
+
+        None
+    }
+
+
 
     
 }

@@ -12,6 +12,8 @@ pub struct Settings {
     pub tile_height: i32,
     pub tile_size: f64,
     pub tile_padding: f64,
+    pub tile_move_time: f64,
+    pub tile_new_time: f64,
 }
 
 impl Settings {
@@ -37,6 +39,8 @@ impl Settings {
             tile_height: s.tile_height,
             tile_size: s.tile_size,
             tile_padding: s.tile_padding,
+            tile_move_time: s.tile_move_time,
+            tile_new_time: s.tile_new_time,
         }
     }
 }
@@ -50,6 +54,8 @@ struct SettingsInJson {
     tile_height: i32,
     tile_size: f64,
     tile_padding: f64,
+    tile_move_time: f64,
+    tile_new_time: f64,
 }
 
 impl SettingsInJson {
@@ -61,6 +67,8 @@ impl SettingsInJson {
             tile_height: 4,
             tile_size: 72.0,
             tile_padding: 16.0,
+            tile_move_time: 0.1,
+            tile_new_time: 0.1,
         }
     }
 

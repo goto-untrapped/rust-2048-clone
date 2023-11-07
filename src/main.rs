@@ -25,12 +25,14 @@ fn main() {
     // オブジェクトを描画できるオブジェクトを生成
     let mut gl = GlGraphics::new(OpenGL::V3_2);
 
-    let mut tile: Tile = Tile { pos_x: 100, pos_y: 100 };
-
     while let Some(e) = window.next() {
         // レンダリング用の引数？
         if let Some(ref args) = e.render_args() {
             app.render(args, &mut gl);
+        }
+
+        if let Some(ref args) = e.update_args() {
+            app.update(args);
         }
 
         if let Some(ref args) = e.press_args() {
@@ -38,14 +40,4 @@ fn main() {
         }
     }
 
-    // タイルを右に動かす
-    fn move_tile_to_right(tile: &mut Tile) {
-        tile.pos_x = 200;
-        println!("{}", tile.pos_x);
-    }
-}
-
-struct Tile {
-    pos_x: i32,
-    pos_y: i32,
 }

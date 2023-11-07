@@ -31,6 +31,10 @@ impl<'a> App<'a> {
         })
     }
 
+    pub fn update(&mut self, args: &UpdateArgs) {
+        self.board.update(args.dt);
+    }
+
     pub fn key_press(&mut self, args: &Button) {
         use piston_window::Button::Keyboard;
 
