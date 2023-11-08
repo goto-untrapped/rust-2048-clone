@@ -4,13 +4,8 @@ use piston_window::*;
 
 #[derive(Debug)]
 pub enum TileState {
-    TileStatic,
-    // (t, x, y, origin_x, origin_y)
-    TileMoving(f64, f64, f64, i32, i32),
-    /// (t, size)
-    TileNew(f64, f64),
     // (t, size)
-    // TileCombine(f64, f64),
+    TileNew(f64, f64),
 }
 pub struct Tile<'a> {
     pub tile_x: i32,
@@ -39,29 +34,11 @@ impl<'a> Tile<'a> {
 
     // タイルを動かす
     pub fn start_moving(&mut self, destination_tile_x: i32, destination_tile_y: i32) {
-        match self.status {
-            TileState::TileStatic => {
-                let (x, y) = self.tile_to_pos(self.tile_x, self.tile_y);
-                self.status = TileState::TileMoving(self.settings.tile_move_time, x, y, self.tile_x, self.tile_y);
-                self.tile_x = destination_tile_x;
-                self.tile_y = destination_tile_y;
-            },
-            _ => {},
-        }
+        
     }
 
     pub fn update(&mut self, dt: f64) {
-        match self.status {
-            TileState::TileNew(t, size) => {
-                if dt >= t {
-                    self.status = TileState::TileStatic;
-                } else {
-                    let factor = dt / t;
-                    self.status = TileState::TileNew(t - dt, size + factor * (self.settings.tile_size - size));
-                }
-            },
-            _ => {},
-        }
+
     }
 
     pub fn render(&self, c: &Context, gl: &mut GlGraphics) {
@@ -69,13 +46,6 @@ impl<'a> Tile<'a> {
         let mut pos: (f64, f64) = self.tile_to_pos(self.tile_x, self.tile_y);
         // タイルのサイズ
         let mut size = (self.settings.tile_size, self.settings.tile_size);
-
-        match self.status {
-            TileState::TileMoving(_, x, y, _, _) => {
-                pos = (x, y);
-            },
-            _ => {},
-        }
 
         let (x, y) = pos;
         let (w, h) = size;
