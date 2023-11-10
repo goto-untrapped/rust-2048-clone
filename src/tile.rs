@@ -4,10 +4,10 @@ use piston_window::*;
 
 #[derive(Debug)]
 pub enum TileState {
+    TileStatic,
     // (t, size)
     TileNew(f64, f64),
     TileMoving(f64, f64, f64, i32, i32),
-    TileStatic,
 }
 pub struct Tile<'a> {
     pub tile_x: i32,
@@ -37,9 +37,6 @@ impl<'a> Tile<'a> {
     // タイルを動かす
     pub fn start_moving(&mut self, t: f64, destination_tile_x: i32, destination_tile_y: i32) {
         match self.status {
-            TileState::TileNew(t, size) => {
-                self.status = TileState::TileStatic;
-            },
             TileState::TileStatic => {
                 let (x, y) = self.tile_to_pos(self.tile_x, self.tile_y);
                 self.status = TileState::TileMoving(t, x, y, destination_tile_x, destination_tile_y);
@@ -61,7 +58,14 @@ impl<'a> Tile<'a> {
                     self.status = TileState::TileMoving(t - dt, x + factor * (dx - x), y + factor * (dy - y), dtx, dty);
                 }
             },
-            TileState::TileStatic => {},
+            TileState::TileNew(t, size) => {
+                if dt >= t {
+                    self.status = TileState::TileStatic;
+                } else {
+                    let factor = dt / t;
+                    self.status = TileState::TileNew(t - dt, size + factor * (self.settings.tile_size - size));
+                }
+            },
             _ => {},
         }
     }
