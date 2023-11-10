@@ -2,14 +2,18 @@ use crate::settings::Settings;
 use opengl_graphics::GlGraphics;
 use piston_window::*;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum TileState {
     TileStatic,
     // (t, size)
     TileNew(f64, f64),
     TileMoving(f64, f64, f64, i32, i32),
+    TileCombine(f64, f64),
 }
+
+#[derive(Clone)]
 pub struct Tile<'a> {
+    pub score: i32,
     pub tile_x: i32,
     pub tile_y: i32,
     pub status: TileState,
@@ -18,11 +22,23 @@ pub struct Tile<'a> {
 }
 
 impl<'a> Tile<'a> {
-    pub fn new(settings: &'a Settings, tile_x: i32, tile_y: i32) -> Tile<'a> {
+    pub fn new(settings: &'a Settings, score: i32, tile_x: i32, tile_y: i32) -> Tile<'a> {
         Tile {
+            score: score,
             tile_x: tile_x,
             tile_y: tile_y,
             status: TileState::TileNew(settings.tile_new_time, 0.0),
+
+            settings: settings,
+        }
+    }
+
+    pub fn new_combined(settings: &'a Settings, score: i32, tile_x: i32, tile_y: i32) -> Tile {
+        Tile {
+            score: score,
+            tile_x: tile_x,
+            tile_y: tile_y,
+            status: TileState::TileCombine(settings.tile_combine_time, 1.2 * settings.tile_size),
 
             settings: settings,
         }
