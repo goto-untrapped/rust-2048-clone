@@ -20,9 +20,6 @@ impl<'a> Board<'a> {
         };
         board.generate_tile();
         board.generate_tile();
-        board.generate_tile();
-        board.generate_tile();
-        board.generate_tile();
         board
     }
 
@@ -60,6 +57,8 @@ impl<'a> Board<'a> {
         if self.is_locking() {
             return;
         }
+
+        let mut score_to_added = 0;
         // タイルが重なるか判定
         let mut tiles_need_removed = HashSet::<usize>::new();
         let mut tiles_need_added = Vec::<Tile>::new();
@@ -78,14 +77,8 @@ impl<'a> Board<'a> {
 
                 tiles_need_removed.insert(i);
                 tiles_need_removed.insert(j);
-                for tile in tiles_need_added.iter() {
-                    println!("{:?}", tile.status);
-                }
-                println!("---");
                 tiles_need_added.push(Tile::new_combined(self.settings, tile1.score + tile2.score, tile1.tile_x, tile1.tile_y));
-                for tile in tiles_need_added.iter() {
-                    println!("{:?}", tile.status);
-                }
+                score_to_added += tile1.score + tile2.score;
                 break;
             }
         }
@@ -105,6 +98,7 @@ impl<'a> Board<'a> {
             } 
 
             self.tiles = tiles;
+            self.add_score(score_to_added);
         }
     }
 
@@ -346,6 +340,11 @@ impl<'a> Board<'a> {
         for tile in self.tiles.iter() {
             tile.render(c, gl);
         }
+    }
+
+    fn add_score(&mut self, score: i32) {
+        self.score += score;
+        println!("Score: {}", self.score);
     }
 
 }

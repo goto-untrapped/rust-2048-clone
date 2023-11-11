@@ -1,9 +1,10 @@
 use opengl_graphics::GlGraphics;
 use piston_window::*;
-use crate::{board::Board, settings::Settings};
+use crate::{board::Board, settings::Settings, number_renderer::NumberRenderer};
 
 pub struct App<'a> {
     board: Board<'a>,
+    number_renderer: Option<NumberRenderer>,
     settings: &'a Settings,
 
     window_background_color: [f32; 4],
