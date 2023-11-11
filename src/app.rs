@@ -14,6 +14,7 @@ impl<'a> App<'a> {
     pub fn new(settings: &'a Settings) -> App {
         App {
             board: Board::new(settings),
+            number_renderer: Some(NumberRenderer::new()),
             settings: settings,
 
             window_background_color: [1.0, 1.0, 1.0, 1.0],
@@ -26,9 +27,11 @@ impl<'a> App<'a> {
         // レンダリングエリアからコンテキストを生成
         let c = &Context::new_abs(area[0], area[1]);
 
+        let nr = &self.number_renderer;
+
         // オブジェクトを描画
         gl.draw(args.viewport(), |_, gl| {
-            self.board.render(c, gl);
+            self.board.render(nr.iter().next().unwrap(), c, gl);
         })
     }
 

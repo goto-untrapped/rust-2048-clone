@@ -3,6 +3,7 @@ use piston_window::*;
 
 mod app;
 mod board;
+mod number_renderer;
 mod settings;
 mod tile;
 

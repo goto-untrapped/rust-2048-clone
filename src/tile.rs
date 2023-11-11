@@ -1,4 +1,4 @@
-use crate::settings::Settings;
+use crate::{settings::Settings, number_renderer::NumberRenderer};
 use opengl_graphics::GlGraphics;
 use piston_window::*;
 
@@ -100,7 +100,7 @@ impl<'a> Tile<'a> {
         }
     }
 
-    pub fn render(&self, c: &Context, gl: &mut GlGraphics) {
+    pub fn render(&self, number_renderer: &NumberRenderer, c: &Context, gl: &mut GlGraphics) {
         // タイルの座標を計算
         let mut pos: (f64, f64) = self.tile_to_pos(self.tile_x, self.tile_y);
         // タイルのサイズ
@@ -134,5 +134,8 @@ impl<'a> Tile<'a> {
             c.transform,
             gl,
         );
+
+        // スコアを描画
+        number_renderer.render(self.score as u32, x + self.settings.tile_size / 2.0, y + self.settings.tile_size / 2.0, self.settings.tile_size, c, gl);
     }
 }

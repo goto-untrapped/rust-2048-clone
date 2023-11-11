@@ -2,8 +2,8 @@ use std::collections::HashSet;
 
 use opengl_graphics::GlGraphics;
 use rand::random;
-use piston_window::{*, modular_index::next};
-use crate::{tile::{Tile, TileState, self}, settings::Settings};
+use piston_window::*;
+use crate::{tile::{Tile, TileState}, settings::Settings, number_renderer::NumberRenderer};
 
 pub struct Board<'a> {
     tiles: Vec<Tile<'a>>,
@@ -102,11 +102,19 @@ impl<'a> Board<'a> {
         }
     }
 
-    pub fn render(&self, c: &Context, gl: &mut GlGraphics) {
+    pub fn render(&self, number_renderer: &NumberRenderer, c: &Context, gl: &mut GlGraphics) {
+        // ボードをレンダリング
+        number_renderer.render(
+            self.score as u32,
+            self.settings.best_rect[0] + self.settings.best_rect[2] / 2.0,
+            self.settings.best_rect[1] + self.settings.best_rect[3] / 2.0,
+            self.settings.best_rect[2],
+            c, gl);
+
         // ボードを描画
         self.render_board(c, gl);
         // タイルを描画
-        self.render_tiles(c, gl);
+        self.render_tiles(number_renderer, c, gl);
     }
 
     pub fn merge_from_left_to_right(&mut self) {
@@ -336,9 +344,9 @@ impl<'a> Board<'a> {
         }
     }
 
-    fn render_tiles(&self, c: &Context, gl: &mut GlGraphics) {
+    fn render_tiles(&self, number_renderer: &NumberRenderer, c: &Context, gl: &mut GlGraphics) {
         for tile in self.tiles.iter() {
-            tile.render(c, gl);
+            tile.render(number_renderer, c, gl);
         }
     }
 
