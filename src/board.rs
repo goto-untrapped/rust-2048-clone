@@ -5,6 +5,8 @@ use rand::random;
 use piston_window::*;
 use crate::{tile::{Tile, TileState}, settings::Settings, number_renderer::NumberRenderer};
 
+fn rgb2rgba(c: [f32; 3]) -> [f32; 4] { [c[0], c[1], c[2], 1.0] }
+
 pub struct Board<'a> {
     tiles: Vec<Tile<'a>>,
     score: i32,
@@ -113,7 +115,7 @@ impl<'a> Board<'a> {
             self.score as u32,
             self.settings.best_rect[0] + self.settings.best_rect[2] / 2.0,
             self.settings.best_rect[1] + self.settings.best_rect[3] / 2.0,
-            self.settings.best_rect[2],
+            self.settings.best_rect[2], self.settings.text_light_color,
             c, gl);
 
         // ボードを描画
@@ -411,7 +413,7 @@ impl<'a> Board<'a> {
 
     fn render_board(&self, c: &Context, gl: &mut GlGraphics) {
         // ボードの外枠を描画
-        Rectangle::new([0.0, 0.5, 0.0, 1.0])
+        Rectangle::new(rgb2rgba(self.settings.label_color))
         .draw(
             [
                 self.settings.board_padding,
@@ -430,7 +432,7 @@ impl<'a> Board<'a> {
         // ボードのタイル配置場所を描画
         for _ in 0..self.settings.tile_height {
             for _ in 0..self.settings.tile_width {
-                Rectangle::new([0.0, 0.0, 0.0, 1.0])
+                Rectangle::new(rgb2rgba(self.settings.tiles_colors[0]))
                 .draw(
                     [x, y, self.settings.tile_size, self.settings.tile_size], 
                     &DrawState::default(), 

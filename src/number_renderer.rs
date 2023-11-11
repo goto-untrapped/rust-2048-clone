@@ -20,7 +20,7 @@ impl NumberRenderer {
         }
     }
 
-    pub fn render(&self, number: u32, center_x: f64, center_y: f64, max_width: f64, c: &Context, gl: &mut GlGraphics) {
+    pub fn render(&self, number: u32, center_x: f64, center_y: f64, max_width: f64, color: [f32; 3], c: &Context, gl: &mut GlGraphics) {
         // タイルのスコアから数字のVecを生成
         let digits = number_to_digits(number);
         // タイルに書き込むスコアの合計幅
@@ -42,7 +42,7 @@ impl NumberRenderer {
 
         // 数字を書き込む
         for digit in digits.iter() {
-            Image::new_color([0.0, 0.5, 0.0, 1.0])
+            Image::new_color([color[0], color[1], color[2], 1.0])
                 .src_rect([(*digit * DIGITS_WIDTH as u32) as f64, 0 as f64, DIGITS_WIDTH as f64, DIGITS_HEIGHT as f64])
                 .rect([x, y, width, height])
                 .draw(&self.image, &DrawState::default(), c.transform, gl);

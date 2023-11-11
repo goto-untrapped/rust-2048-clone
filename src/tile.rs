@@ -121,9 +121,10 @@ impl<'a> Tile<'a> {
 
         let (x, y) = pos;
         let (w, h) = size;
+        let color = self.get_color();
 
         // タイルを描画
-        Rectangle::new([1.0, 1.0, 1.0, 1.0]).draw(
+        Rectangle::new([color[0], color[1], color[2], 1.0]).draw(
             rectangle::centered([
                 x as f64 + self.settings.tile_size / 2.0,
                 y as f64 + self.settings.tile_size / 2.0,
@@ -135,7 +136,23 @@ impl<'a> Tile<'a> {
             gl,
         );
 
+        let color = if self.score >= 8 {
+            self.settings.text_light_color
+        } else {
+            self.settings.text_dark_color
+        };
+
         // スコアを描画
-        number_renderer.render(self.score as u32, x + self.settings.tile_size / 2.0, y + self.settings.tile_size / 2.0, self.settings.tile_size, c, gl);
+        number_renderer.render(self.score as u32, x + self.settings.tile_size / 2.0, y + self.settings.tile_size / 2.0, self.settings.tile_size, color, c, gl);
+    }
+
+    fn get_color(&self) -> [f32; 3] {
+        // 2のi乗がscoreになるようなi
+        let i = (self.score as f64).log2() as usize;
+        if i > 0 && i < self.settings.tiles_colors.len() {
+            self.settings.tiles_colors[i]
+        } else {
+            self.settings.tile_unknow_color
+        }
     }
 }

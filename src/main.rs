@@ -16,13 +16,15 @@ fn main() {
     let (width, height) = (settings.window_size[0], settings.window_size[1]);
     // ウィンドウを初期化
     let mut window: PistonWindow = 
-        WindowSettings::new("title" , [width, height])
+        WindowSettings::new("Rust-2048" , [width, height])
             .exit_on_esc(true)
             .build()
-            .unwrap();
+            .unwrap_or_else(|e| { panic!("Failed to build PistonWindow: {}", e) });
 
+    // 使うオブジェクトを初期化
     let mut app = app::App::new(&settings);
 
+    // アセットを読み込む
     app.load();
 
     // オブジェクトを描画できるオブジェクトを生成
