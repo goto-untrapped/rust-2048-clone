@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use opengl_graphics::GlGraphics;
 use rand::random;
 use piston_window::{*, modular_index::next};
-use crate::{tile::{Tile, TileState}, settings::Settings};
+use crate::{tile::{Tile, TileState, self}, settings::Settings};
 
 pub struct Board<'a> {
     tiles: Vec<Tile<'a>>,
@@ -18,7 +18,6 @@ impl<'a> Board<'a> {
             score: 0,
             settings: settings,
         };
-        board.generate_tile();
         board.generate_tile();
         board.generate_tile();
         board.generate_tile();
@@ -49,16 +48,6 @@ impl<'a> Board<'a> {
                 break;
             }
         }
-    }
-
-    fn get_tile<'b>(&'b self, x: i32, y: i32) -> Option<&'b Tile<'a>> {
-        for tile in self.tiles.iter() {
-            if tile.tile_x == x && tile.tile_y == y {
-                return Some(tile);
-            }
-        }
-
-        None
     }
 
     pub fn update(&mut self, dt: f64) {
@@ -112,20 +101,30 @@ impl<'a> Board<'a> {
         }
     }
 
+    pub fn render(&self, c: &Context, gl: &mut GlGraphics) {
+        // ボードを描画
+        self.render_board(c, gl);
+        // タイルを描画
+        self.render_tiles(c, gl);
+    }
 
-    pub fn move_from_left_to_right(&mut self) {
+    pub fn merge_from_left_to_right(&mut self) {
         let width = self.settings.tile_width;
         // 動かす先のタイルの検索に使う
         self.merge_row(width - 1, -1, -1);
     }
 
-    pub fn move_from_right_to_left(&mut self) {
+    pub fn merge_from_right_to_left(&mut self) {
         let width = self.settings.tile_width;
         self.merge_row(0, width - 1, 1)
     }
 
     fn merge_row(&mut self, x_start: i32, x_end: i32, x_step: i32) {
-        // タイルが止まるまで動かさないため
+        for tile in self.tiles.iter() {
+            println!("{:?}", tile.status);
+        }
+
+        // タイルのStatusがStaticでない場合、動かせない
         if self.is_locking() {
             return;
         }
@@ -161,7 +160,7 @@ impl<'a> Board<'a> {
                                 Some (ref mut tile) => {
                                     println!("move ({}, {}) to ({}, {})", tile.tile_x, tile.tile_y, col, row);
                                     need_generate = true;
-                                    tile.start_moving(0.1, col, row);
+                                    tile.start_moving(col, row);
                                 },
                                 // 動かす元のタイルがない場合、何もしない
                                 _ => {},
@@ -172,47 +171,54 @@ impl<'a> Board<'a> {
                     }
                 }
             }
-            break;
-        }
 
-        // タイルをマージする
-        let mut did_merged = false;
-        for row in 0..self.settings.tile_height {
-            let mut found = false;
-            let mut sx = 0;
-            let mut sy = 0;
-            let mut dx = 0;
-            let mut dy = 0;
-            for col in steps.to_vec() {
-                match self.get_tile(col, row) {
-                    Some(ref d_tile) => {
-                        match self.get_next_tile(col, row, x_step, 0) {
-                                Some(ref s_tile) if d_tile.score == s_tile.score => {
-                                found = true;
-                                dx = d_tile.tile_x;
-                                dy = d_tile.tile_y;
-                                sx = s_tile.tile_x;
-                                sy = s_tile.tile_y;
-                                break;
+            // タイルをマージする
+            let mut did_merged = false;
+            for row in 0..self.settings.tile_height {
+                let mut found = false;
+                let mut sx = 0;
+                let mut sy = 0;
+                let mut dx = 0;
+                let mut dy = 0;
+                for col in steps.to_vec() {
+                    match self.get_tile(col, row) {
+                        Some(ref d_tile) => {
+                            match self.get_next_tile(col, row, x_step, 0) {
+                                Some(ref s_tile) 
+                                if d_tile.score == s_tile.score 
+                                && self.get_tile_count(d_tile.tile_x, d_tile.tile_y) == 1 => {
+                                    found = true;
+                                    dx = d_tile.tile_x;
+                                    dy = d_tile.tile_y;
+                                    sx = s_tile.tile_x;
+                                    sy = s_tile.tile_y;
+                                    break;
                                 },
-                        _ => {},
+                                _ => {},
+                            }
+                        },
+                        None => {
+                            break;
                         }
-                    },
-                    None => {
-                        break;
                     }
                 }
-            }
-            if found {
-                did_merged = true;
-                let mut tile = self.get_mut_tile(sx, sy).unwrap();
-                tile.start_moving(0.1, dx, dy);
-                println!("merge ({}, {}) to ({}, {})", sx, sy, dx, dy);
+
+                if found {
+                    need_generate = true;
+                    did_merged = true;
+                    let tile = self.get_mut_tile(sx, sy).unwrap();
+                    tile.start_moving(dx, dy);
+                    println!("merge ({}, {}) to ({}, {})", sx, sy, dx, dy);
+                }
             }
 
             if !did_merged {
                 break;
             }
+        }
+
+        if need_generate {
+            self.generate_tile();
         }
     }
 
@@ -263,6 +269,16 @@ impl<'a> Board<'a> {
             None
         }
     }
+    
+    fn get_tile<'b>(&'b self, x: i32, y: i32) -> Option<&'b Tile<'a>> {
+        for tile in self.tiles.iter() {
+            if tile.tile_x == x && tile.tile_y == y {
+                return Some(tile);
+            }
+        }
+
+        None
+    }
 
     fn get_mut_tile<'b>(&'b mut self, x: i32, y: i32) -> Option<&'b mut Tile<'a>> {
         for tile in self.tiles.iter_mut() {
@@ -274,12 +290,15 @@ impl<'a> Board<'a> {
         None
     }
 
-    pub fn render(&self, c: &Context, gl: &mut GlGraphics) {
+    fn get_tile_count(&self, x: i32, y: i32) -> i32 {
+        let mut count = 0;
+        for tile in self.tiles.iter() {
+            if tile.tile_x == x && tile.tile_y == y {
+                count += 1;
+            }
+        }
 
-        // ボードを描画
-        self.render_board(c, gl);
-        // タイルを描画
-        self.render_tiles(c, gl);
+        count
     }
 
     fn render_board(&self, c: &Context, gl: &mut GlGraphics) {

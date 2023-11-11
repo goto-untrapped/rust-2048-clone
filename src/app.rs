@@ -39,11 +39,11 @@ impl<'a> App<'a> {
         use piston_window::Button::Keyboard;
 
         if *args == Keyboard(Key::Right) {
-            self.board.move_from_left_to_right();
+            self.board.merge_from_left_to_right();
         }
 
         if *args == Keyboard(Key::Left) {
-            self.board.move_from_right_to_left();
+            self.board.merge_from_right_to_left();
         }
     }
 

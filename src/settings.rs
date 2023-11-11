@@ -3,6 +3,7 @@ use rustc_serialize::{ json, Encodable, Decodable };
 
 static SETTING_FILENAME: &'static str = "settings.json";
 
+#[derive(Debug)]
 pub struct Settings {
     pub board_padding: f64,
     pub board_size: [f64; 2],

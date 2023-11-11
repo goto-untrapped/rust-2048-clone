@@ -11,7 +11,7 @@ pub enum TileState {
     TileCombine(f64, f64),
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Tile<'a> {
     pub score: i32,
     pub tile_x: i32,
@@ -33,7 +33,7 @@ impl<'a> Tile<'a> {
         }
     }
 
-    pub fn new_combined(settings: &'a Settings, score: i32, tile_x: i32, tile_y: i32) -> Tile {
+    pub fn new_combined(settings: &'a Settings, score: i32, tile_x: i32, tile_y: i32) -> Tile<'a> {
         Tile {
             score: score,
             tile_x: tile_x,
@@ -51,11 +51,19 @@ impl<'a> Tile<'a> {
     }
 
     // タイルを動かす
-    pub fn start_moving(&mut self, t: f64, destination_tile_x: i32, destination_tile_y: i32) {
+    pub fn start_moving(&mut self, destination_tile_x: i32, destination_tile_y: i32) {
         match self.status {
+            TileState::TileMoving(_, _, _, ox, oy) => {
+                let (x, y) = self.tile_to_pos(ox, oy);
+                self.status = TileState::TileMoving(self.settings.tile_move_time, x, y, ox, oy);
+                self.tile_x = destination_tile_x;
+                self.tile_y = destination_tile_y;
+            },
             TileState::TileStatic => {
                 let (x, y) = self.tile_to_pos(self.tile_x, self.tile_y);
-                self.status = TileState::TileMoving(t, x, y, destination_tile_x, destination_tile_y);
+                self.status = TileState::TileMoving(self.settings.tile_move_time, x, y, destination_tile_x, destination_tile_y);
+                self.tile_x = destination_tile_x;
+                self.tile_y = destination_tile_y;
             },
             _ => {},
         }
@@ -80,6 +88,14 @@ impl<'a> Tile<'a> {
                 } else {
                     let factor = dt / t;
                     self.status = TileState::TileNew(t - dt, size + factor * (self.settings.tile_size - size));
+                }
+            },
+            TileState::TileCombine(t, size) => {
+                if dt >= t {
+                    self.status = TileState::TileStatic;
+                } else {
+                    let factor = dt / t;
+                    self.status = TileState::TileCombine(t - dt, size + factor * (self.settings.tile_size - size));
                 }
             },
             _ => {},

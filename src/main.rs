@@ -26,15 +26,17 @@ fn main() {
     let mut gl = GlGraphics::new(OpenGL::V3_2);
 
     while let Some(e) = window.next() {
-        // レンダリング用の引数？
+        // 描画する要素を更新
         if let Some(ref args) = e.render_args() {
             app.render(args, &mut gl);
         }
 
+        // 変数の状態を更新
         if let Some(ref args) = e.update_args() {
             app.update(args);
         }
 
+        // キーボード入力受付
         if let Some(ref args) = e.press_args() {
             app.key_press(args);
         }
