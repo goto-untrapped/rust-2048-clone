@@ -78,7 +78,14 @@ impl<'a> Board<'a> {
 
                 tiles_need_removed.insert(i);
                 tiles_need_removed.insert(j);
+                for tile in tiles_need_added.iter() {
+                    println!("{:?}", tile.status);
+                }
+                println!("---");
                 tiles_need_added.push(Tile::new_combined(self.settings, tile1.score + tile2.score, tile1.tile_x, tile1.tile_y));
+                for tile in tiles_need_added.iter() {
+                    println!("{:?}", tile.status);
+                }
                 break;
             }
         }
@@ -120,10 +127,6 @@ impl<'a> Board<'a> {
     }
 
     fn merge_row(&mut self, x_start: i32, x_end: i32, x_step: i32) {
-        for tile in self.tiles.iter() {
-            println!("{:?}", tile.status);
-        }
-
         // タイルのStatusがStaticでない場合、動かせない
         if self.is_locking() {
             return;

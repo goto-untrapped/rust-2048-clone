@@ -61,7 +61,7 @@ impl<'a> Tile<'a> {
             },
             TileState::TileStatic => {
                 let (x, y) = self.tile_to_pos(self.tile_x, self.tile_y);
-                self.status = TileState::TileMoving(self.settings.tile_move_time, x, y, destination_tile_x, destination_tile_y);
+                self.status = TileState::TileMoving(self.settings.tile_move_time, x, y, self.tile_x, self.tile_y);
                 self.tile_x = destination_tile_x;
                 self.tile_y = destination_tile_y;
             },
@@ -71,15 +71,13 @@ impl<'a> Tile<'a> {
 
     pub fn update(&mut self, dt: f64) {
         match self.status {
-            TileState::TileMoving(t, x, y, dtx, dty) => {
+            TileState::TileMoving(t, x, y, ox, oy) => {
                 if dt >= t {
-                    self.tile_x = dtx;
-                    self.tile_y = dty;
                     self.status = TileState::TileStatic;
                 } else {
-                    let (dx, dy) = self.tile_to_pos(dtx, dty);
+                    let (dx, dy) = self.tile_to_pos(self.tile_x, self.tile_y);
                     let factor = dt / t;
-                    self.status = TileState::TileMoving(t - dt, x + factor * (dx - x), y + factor * (dy - y), dtx, dty);
+                    self.status = TileState::TileMoving(t - dt, x + factor * (dx - x), y + factor * (dy - y), ox, oy);
                 }
             },
             TileState::TileNew(t, size) => {
@@ -107,6 +105,19 @@ impl<'a> Tile<'a> {
         let mut pos: (f64, f64) = self.tile_to_pos(self.tile_x, self.tile_y);
         // タイルのサイズ
         let mut size = (self.settings.tile_size, self.settings.tile_size);
+
+        match self.status {
+            TileState::TileMoving(_, x, y, _, _) => {
+                pos = (x, y);
+            },
+            TileState::TileNew(_, s) => {
+                size = (s, s);
+            },
+            TileState::TileCombine(_, s) => {
+                size = (s, s);
+            },
+            _ => {},
+        }
 
         let (x, y) = pos;
         let (w, h) = size;
