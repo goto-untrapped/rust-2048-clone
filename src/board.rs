@@ -66,12 +66,14 @@ impl<'a> Board<'a> {
         let mut tiles_need_removed = HashSet::<usize>::new();
         let mut tiles_need_added = Vec::<Tile>::new();
         for i in 0..self.tiles.len() {
-            let tile1 = self.tiles.get(i).unwrap();
+            let tile1 = &self.tiles[i];
+            
             if tile1.status != TileState::TileStatic {
                 continue;
             }
+
             for j in i+1..self.tiles.len() {
-                let tile2 = self.tiles.get(j).unwrap();
+                let tile2 = &self.tiles[j];
                 if tile2.status != TileState::TileStatic
                     || tile1.tile_x != tile2.tile_x
                     || tile1.tile_y != tile2.tile_y {
@@ -92,7 +94,7 @@ impl<'a> Board<'a> {
 
             for i in 0..self.tiles.len() {
                 if !tiles_need_removed.contains(&i) {
-                    tiles.push(self.tiles.get(i).unwrap().clone());
+                    tiles.push(self.tiles[i].clone());
                 }
             }
             

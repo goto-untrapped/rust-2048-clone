@@ -23,6 +23,8 @@ fn main() {
 
     let mut app = app::App::new(&settings);
 
+    app.load();
+
     // オブジェクトを描画できるオブジェクトを生成
     let mut gl = GlGraphics::new(OpenGL::V3_2);
 
