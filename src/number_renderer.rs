@@ -43,9 +43,11 @@ impl NumberRenderer {
         // 数字を書き込む
         for digit in digits.iter() {
             Image::new_color([0.0, 0.5, 0.0, 1.0])
-                .src_rect([(*digit * DIGITS_WIDTH as u32) as f64, 0 as f64,  DIGITS_WIDTH as f64, DIGITS_HEIGHT as f64])
+                .src_rect([(*digit * DIGITS_WIDTH as u32) as f64, 0 as f64, DIGITS_WIDTH as f64, DIGITS_HEIGHT as f64])
                 .rect([x, y, width, height])
                 .draw(&self.image, &DrawState::default(), c.transform, gl);
+
+            x += width;
         }
     }
 }
@@ -61,7 +63,7 @@ fn number_to_digits(number: u32) -> Vec<u32> {
     // スコアが16なら[1, 6]になるように詰め替える
     let mut n = number;
     while n != 0 {
-        digits.insert(0, n & 10);
+        digits.insert(0, n % 10);
         n /= 10;
     }
 
