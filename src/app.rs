@@ -134,12 +134,8 @@ impl<'a> App<'a> {
 
         // キーspaceを入力
         if *args == Keyboard(Key::Space) {
-            self.initialize();
+            self.board = Board::new(self.settings);
         }
-    }
-
-    pub fn initialize(&mut self) {
-        self.board = Board::new(self.settings);
     }
 
 }
