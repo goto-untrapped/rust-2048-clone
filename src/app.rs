@@ -131,6 +131,15 @@ impl<'a> App<'a> {
         if *args == Keyboard(Key::Left) {
             self.board.merge_from_right_to_left();
         }
+
+        // キーspaceを入力
+        if *args == Keyboard(Key::Space) {
+            self.initialize();
+        }
+    }
+
+    pub fn initialize(&mut self) {
+        self.board = Board::new(self.settings);
     }
 
 }
